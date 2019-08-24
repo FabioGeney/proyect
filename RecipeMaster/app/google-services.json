@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "811387286657",
+    "firebase_url": "https://recipemaster-51432.firebaseio.com",
+    "project_id": "recipemaster-51432",
+    "storage_bucket": "recipemaster-51432.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811387286657:android:267a61a148693548",
+        "android_client_info": {
+          "package_name": "com.proyecto.recipemaster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "811387286657-m06p2uroppq3jqu0t3me6rgjcvfg2un7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.proyecto.recipemaster",
+            "certificate_hash": "715aaa267de3fea53ecd16db60324d95a27b22a9"
+          }
+        },
+        {
+          "client_id": "811387286657-lrpbjs0vnk2tvofhklrrohsi6vfv97vn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1YkBtMVsN0w8ylcS2CpKGBQJQWSX8Yk8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "811387286657-lrpbjs0vnk2tvofhklrrohsi6vfv97vn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
