@@ -8,71 +8,66 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.proyecto.recipemaster.Clases.Pasos;
+
+import com.proyecto.recipemaster.Clases.Ingredientes;
 import com.proyecto.recipemaster.R;
+import com.proyecto.recipemaster.Singlentons.SingletonIngredientes;
 import com.proyecto.recipemaster.Singlentons.SingletonPasos;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class PasosAdapter  extends RecyclerView.Adapter<PasosAdapter.ViewHolder>  {
-
-    private List<Pasos> pasos = new ArrayList<>();
-    private SingletonPasos singletonPasos = SingletonPasos.getInstance();
+public class IngredientesAdapter extends RecyclerView.Adapter<IngredientesAdapter.ViewHolder> {
+    private List<Ingredientes> ingredientes = new ArrayList<>();
+    private SingletonIngredientes singletonIngredientes = SingletonIngredientes.getInstance();
 
     private OnItemClickListener itemClickListener;
     private Context context;
 
-    public PasosAdapter(Context context, PasosAdapter.OnItemClickListener itemClickListener ){
+    public IngredientesAdapter(Context context, OnItemClickListener itemClickListener ){
         this.context = context;
         this.itemClickListener =  itemClickListener;
     }
 
-    public void agregarPaso(Pasos key){
-        pasos.add(key);
-        notifyItemInserted(pasos.size());
+    public void agregarIngrediente(Ingredientes key){
+        ingredientes.add(key);
+        notifyDataSetChanged();
     }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_pasos, viewGroup, false);
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_ingredientes, viewGroup, false);
         ViewHolder viewHolder = new ViewHolder(v);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        viewHolder.bind(pasos.get(i),itemClickListener);
+        viewHolder.bind(ingredientes.get(i),itemClickListener);
     }
 
     @Override
     public int getItemCount() {
-        return pasos.size();
+        return ingredientes.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
 
-        private TextView numero;
-        private EditText despcricion;
+        private EditText ingredienteEdt;
         private ImageView close;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            numero = itemView.findViewById(R.id.numero);
-            despcricion = itemView.findViewById(R.id.paso);
             close = itemView.findViewById(R.id.close);
+            ingredienteEdt = itemView.findViewById(R.id.ingredientes);
         }
-        public void bind( final Pasos paso, final OnItemClickListener listener){
-            int index = getAdapterPosition()+1;
-            numero.setText("  "+index);
-            despcricion.addTextChangedListener(new TextWatcher() {
+        public void bind( final Ingredientes ingrediente, final OnItemClickListener listener){
+
+            ingredienteEdt.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -80,13 +75,12 @@ public class PasosAdapter  extends RecyclerView.Adapter<PasosAdapter.ViewHolder>
 
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                    ingrediente.setNombreCantidad(ingredienteEdt.getText().toString());
+                    singletonIngredientes.setIngredientes(""+getAdapterPosition(), ingrediente);
                 }
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    paso.setDescripcion(despcricion.getText().toString());
-                    singletonPasos.setPaso(""+getAdapterPosition(), paso);
 
                 }
             });
@@ -94,37 +88,38 @@ public class PasosAdapter  extends RecyclerView.Adapter<PasosAdapter.ViewHolder>
             close.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    pasos.remove(getAdapterPosition());
-                    singletonPasos.remove(""+getAdapterPosition());
-                    //updateAll();
+                    ingredientes.remove(getAdapterPosition());
+                    singletonIngredientes.remove(""+getAdapterPosition());
+                    updateAll();
 
                 }
             });
-
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.OnItemClick(paso, getAdapterPosition());
+                    listener.OnItemClick(ingrediente, getAdapterPosition());
                 }
             });
+
+
 
 
         }
     }
-
     private void updateAll(){
-        ArrayList<Pasos> temp = singletonPasos.getPasos();
-        singletonPasos.removeAll();
+        ArrayList<Ingredientes> temp = singletonIngredientes.getPasos();
+        singletonIngredientes.removeAll();
         int index = 0;
-        for (Pasos paso: temp){
-            singletonPasos.setPaso(""+index, paso);
+        for (Ingredientes paso: temp){
+            singletonIngredientes.setIngredientes(""+index, paso);
         }
         notifyDataSetChanged();
+
 
     }
 
     public interface OnItemClickListener{
-        void OnItemClick(Pasos paso, int posicion);
+        void OnItemClick(Ingredientes ingredientes, int posicion);
 
     }
 }
