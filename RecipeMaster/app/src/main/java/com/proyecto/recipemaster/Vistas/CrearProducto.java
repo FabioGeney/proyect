@@ -2,6 +2,7 @@ package com.proyecto.recipemaster.Vistas;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +20,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -26,7 +28,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -36,9 +44,9 @@ import com.proyecto.recipemaster.Adapter.IngredientesAdapter;
 import com.proyecto.recipemaster.Adapter.PasosAdapter;
 import com.proyecto.recipemaster.Clases.Ingredientes;
 import com.proyecto.recipemaster.Clases.Pasos;
+import com.proyecto.recipemaster.Clases.Receta;
 import com.proyecto.recipemaster.Clases.Utility;
 import com.proyecto.recipemaster.R;
-import com.proyecto.recipemaster.Singlentons.SingletonPasos;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -53,33 +61,38 @@ public class CrearProducto extends AppCompatActivity {
     private ImageView imageView;
     private EditText nombre;
     private EditText descripcion;
+    private EditText tipo;
     private RecyclerView listIngredientes;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.LayoutManager layoutManagerIng;
     private IngredientesAdapter ingredientesAdapter;
+    private StorageReference hStorageRef;
     private Button ingrediente;
     private Button pasos;
     private RecyclerView lisPasos;
+    private String picture;
     private int SELECT_FILE = 1;
     private int REQUEST_CAMERA = 0;
     private String photoPath;
     private String eleccionusuario;
-
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Uri hImagenUri;
     private PasosAdapter pasosAdapter;
-    private int contador=1;
-    private int contador2=1;
     private Button publicar;
-    private SingletonPasos singletonPasos = SingletonPasos.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crear_producto);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.setTitle("Crear Receta");
         publicar = findViewById(R.id.publicar);
         imageView = findViewById(R.id.imageView);
         nombre = findViewById(R.id.nombre);
         descripcion = findViewById(R.id.descripcion);
+        tipo = findViewById(R.id.tipo);
         listIngredientes = findViewById(R.id.listIngredientes);
         lisPasos = findViewById(R.id.pasosList);
         ingrediente = findViewById(R.id.button2);
@@ -91,6 +104,24 @@ public class CrearProducto extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 seleccionarImagen();
+            }
+        });
+
+        hStorageRef = FirebaseStorage.getInstance().getReference("Subidas");
+        descripcion.setCompoundDrawablesWithIntrinsicBounds(R.drawable.description, 0, 0, 0);
+        nombre.setCompoundDrawablesWithIntrinsicBounds(R.drawable.receta, 0, 0, 0);
+        tipo.setCompoundDrawablesWithIntrinsicBounds(R.drawable.tipo, 0, 0, 0);
+        tipo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.arrow_down, 0);
+
+        tipo.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    seleccionaTipo();
+                }
+
+                return false;
             }
         });
 
@@ -113,6 +144,7 @@ public class CrearProducto extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 pasosAdapter.agregarPaso(new Pasos());
+
             }
         });
 
@@ -125,14 +157,17 @@ public class CrearProducto extends AppCompatActivity {
         publicar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<Pasos> pasos = singletonPasos.getPasos();
+                List<Pasos> pasos = pasosAdapter.getPasos();
                 String temp = "";
                 for(Pasos index: pasos){
                     temp = temp+" "+index.getDescripcion();
                 }
                 Toast.makeText(CrearProducto.this, ""+temp, Toast.LENGTH_SHORT).show();
+
+                uploadFile();
             }
         });
+
 
         listIngredientes.setLayoutManager(layoutManagerIng);
         listIngredientes.setAdapter(ingredientesAdapter);
@@ -141,16 +176,18 @@ public class CrearProducto extends AppCompatActivity {
     }
 
     private void setPasos(){
+
         pasosAdapter.agregarPaso(new Pasos());
+
         pasosAdapter.agregarPaso(new Pasos());
+
 
 
     }
     private void setIngredientes(){
         ingredientesAdapter.agregarIngrediente(new Ingredientes());
-        contador2++;
         ingredientesAdapter.agregarIngrediente(new Ingredientes());
-        contador2++;
+
 
     }
 
@@ -290,8 +327,10 @@ public class CrearProducto extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        imageView.setImageBitmap(b);
+
+        //imageView.setImageBitmap(b);
         hImagenUri = data.getData();
+        Picasso.with(this).load(hImagenUri).fit().into(imageView);
     }
     private void galeriaIntent(){
         Intent intent = new Intent();
@@ -306,5 +345,96 @@ public class CrearProducto extends AppCompatActivity {
         return mime.getExtensionFromMimeType(c.getType(uri));
     }
 
+    private void uploadFile(){
+        if(hImagenUri != null) {
+
+            final StorageReference fileReference = hStorageRef.child(System.currentTimeMillis() + "." + getFileExtension(hImagenUri));
+
+            fileReference.putFile(hImagenUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //Toast.makeText(CrearProducto.this, "Imagen cargada", Toast.LENGTH_SHORT).show();
+
+                    fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            picture = uri.toString();
+                            guardarReceta();
+                        }
+                    });
+
+                    //picture = taskSnapshot.getStorage().getDownloadUrl().toString();
+                    /*String uploadId = hDatabaseRef.push().getKey();
+                    hDatabaseRef.child(uploadId).setValue(picture);*/
+                }
+            /*}).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(CrearProducto.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
+                }
+            });
+
+
+        */
+            });
+        }
+        else {
+
+        }
+    }
+
+    private void guardarReceta(){
+        CollectionReference enviarReceta = db.collection("Recetas");
+        String idUsuario = "23123";
+        String name = nombre.getText().toString();
+        String descrip = descripcion.getText().toString();
+        String tipo = "Azucar";
+        List<Pasos> pasos = pasosAdapter.getPasos();
+        List<Ingredientes> ingredientes = ingredientesAdapter.getIngredientes();
+
+        Receta receta = new Receta(idUsuario, name, descrip, tipo, picture, pasos, ingredientes);
+        enviarReceta.add(receta);
+    }
+
+    private void seleccionaTipo(){
+        final CharSequence[] item = {"Típica","Fast","Fit","Oriental", "Europea", "Otro"};
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Seleccione un tipo");
+        alert.setItems(item, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (item[which].toString()){
+                    case "Típica":
+                        tipo.setText(item[which].toString());
+                        break;
+                    case "Fast":
+                        tipo.setText(item[which].toString());
+                        break;
+                    case "Fit":
+                        tipo.setText(item[which].toString());
+                        break;
+                    case "Europea":
+                        tipo.setText(item[which].toString());
+                        break;
+                    case "Oriental":
+                        tipo.setText(item[which].toString());
+                        break;
+                    case "Otro":
+                        tipo.setText(item[which].toString());
+                        break;
+                    default:
+                        dialog.dismiss();
+
+                }
+            }
+        });
+        alert.show();
+    }
 
 }

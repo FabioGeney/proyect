@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.proyecto.recipemaster.Clases.Pasos;
 import com.proyecto.recipemaster.R;
-import com.proyecto.recipemaster.Singlentons.SingletonPasos;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,7 +23,7 @@ import java.util.Map;
 public class PasosAdapter  extends RecyclerView.Adapter<PasosAdapter.ViewHolder>  {
 
     private List<Pasos> pasos = new ArrayList<>();
-    private SingletonPasos singletonPasos = SingletonPasos.getInstance();
+
 
     private OnItemClickListener itemClickListener;
     private Context context;
@@ -37,6 +36,9 @@ public class PasosAdapter  extends RecyclerView.Adapter<PasosAdapter.ViewHolder>
     public void agregarPaso(Pasos key){
         pasos.add(key);
         notifyItemInserted(pasos.size());
+    }
+    public List<Pasos> getPasos(){
+        return pasos;
     }
     @NonNull
     @Override
@@ -72,6 +74,9 @@ public class PasosAdapter  extends RecyclerView.Adapter<PasosAdapter.ViewHolder>
         public void bind( final Pasos paso, final OnItemClickListener listener){
             int index = getAdapterPosition()+1;
             numero.setText("  "+index);
+            if(paso.getDescripcion()!=null){
+                despcricion.setText(paso.getDescripcion());
+            }
             despcricion.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -80,13 +85,12 @@ public class PasosAdapter  extends RecyclerView.Adapter<PasosAdapter.ViewHolder>
 
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                    paso.setDescripcion(despcricion.getText().toString());
                 }
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    paso.setDescripcion(despcricion.getText().toString());
-                    singletonPasos.setPaso(""+getAdapterPosition(), paso);
+
 
                 }
             });
@@ -94,8 +98,10 @@ public class PasosAdapter  extends RecyclerView.Adapter<PasosAdapter.ViewHolder>
             close.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    pasos.remove(getAdapterPosition());
-                    singletonPasos.remove(""+getAdapterPosition());
+                    paso.setDescripcion(null);
+                    pasos.remove(paso);
+                    despcricion.setText(null);
+                    notifyDataSetChanged();
                     //updateAll();
 
                 }
@@ -112,16 +118,6 @@ public class PasosAdapter  extends RecyclerView.Adapter<PasosAdapter.ViewHolder>
         }
     }
 
-    private void updateAll(){
-        ArrayList<Pasos> temp = singletonPasos.getPasos();
-        singletonPasos.removeAll();
-        int index = 0;
-        for (Pasos paso: temp){
-            singletonPasos.setPaso(""+index, paso);
-        }
-        notifyDataSetChanged();
-
-    }
 
     public interface OnItemClickListener{
         void OnItemClick(Pasos paso, int posicion);

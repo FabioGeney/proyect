@@ -14,15 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.proyecto.recipemaster.Clases.Ingredientes;
 import com.proyecto.recipemaster.R;
-import com.proyecto.recipemaster.Singlentons.SingletonIngredientes;
-import com.proyecto.recipemaster.Singlentons.SingletonPasos;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class IngredientesAdapter extends RecyclerView.Adapter<IngredientesAdapter.ViewHolder> {
     private List<Ingredientes> ingredientes = new ArrayList<>();
-    private SingletonIngredientes singletonIngredientes = SingletonIngredientes.getInstance();
+
 
     private OnItemClickListener itemClickListener;
     private Context context;
@@ -34,7 +33,11 @@ public class IngredientesAdapter extends RecyclerView.Adapter<IngredientesAdapte
 
     public void agregarIngrediente(Ingredientes key){
         ingredientes.add(key);
-        notifyDataSetChanged();
+        notifyItemInserted(ingredientes.size());
+    }
+
+    public List<Ingredientes> getIngredientes(){
+        return ingredientes;
     }
     @NonNull
     @Override
@@ -67,6 +70,7 @@ public class IngredientesAdapter extends RecyclerView.Adapter<IngredientesAdapte
         }
         public void bind( final Ingredientes ingrediente, final OnItemClickListener listener){
 
+
             ingredienteEdt.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -76,7 +80,7 @@ public class IngredientesAdapter extends RecyclerView.Adapter<IngredientesAdapte
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                     ingrediente.setNombreCantidad(ingredienteEdt.getText().toString());
-                    singletonIngredientes.setIngredientes(""+getAdapterPosition(), ingrediente);
+
                 }
 
                 @Override
@@ -89,8 +93,7 @@ public class IngredientesAdapter extends RecyclerView.Adapter<IngredientesAdapte
                 @Override
                 public void onClick(View view) {
                     ingredientes.remove(getAdapterPosition());
-                    singletonIngredientes.remove(""+getAdapterPosition());
-                    updateAll();
+
 
                 }
             });
@@ -106,17 +109,7 @@ public class IngredientesAdapter extends RecyclerView.Adapter<IngredientesAdapte
 
         }
     }
-    private void updateAll(){
-        ArrayList<Ingredientes> temp = singletonIngredientes.getPasos();
-        singletonIngredientes.removeAll();
-        int index = 0;
-        for (Ingredientes paso: temp){
-            singletonIngredientes.setIngredientes(""+index, paso);
-        }
-        notifyDataSetChanged();
 
-
-    }
 
     public interface OnItemClickListener{
         void OnItemClick(Ingredientes ingredientes, int posicion);
