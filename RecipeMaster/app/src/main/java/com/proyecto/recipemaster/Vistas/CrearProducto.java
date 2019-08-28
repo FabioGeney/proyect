@@ -398,7 +398,7 @@ public class CrearProducto extends AppCompatActivity {
         List<Pasos> pasos = pasosAdapter.getPasos();
         List<Ingredientes> ingredientes = ingredientesAdapter.getIngredientes();
 
-        Receta receta = new Receta(idUsuario, name, descrip, tipo, picture, pasos, ingredientes);
+        Receta receta = new Receta(idUsuario, name, "yo", descrip, tipo, picture, pasos, ingredientes);
         enviarReceta.add(receta);
     }
 
