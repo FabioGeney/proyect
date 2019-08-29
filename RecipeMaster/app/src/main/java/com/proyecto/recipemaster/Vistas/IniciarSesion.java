@@ -24,12 +24,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.proyecto.recipemaster.Clases.Receta;
 import com.proyecto.recipemaster.Clases.Recetero;
 import com.proyecto.recipemaster.Clases.SessionManager;
 import com.proyecto.recipemaster.MainActivity;
 import com.proyecto.recipemaster.R;
+import com.proyecto.recipemaster.Singletons.SingletonUsuario;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class IniciarSesion extends AppCompatActivity {
@@ -48,6 +51,8 @@ public class IniciarSesion extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
+        sessionManager.checkLogin();
         setContentView(R.layout.activity_iniciar_sesion);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -58,6 +63,7 @@ public class IniciarSesion extends AppCompatActivity {
         contraseña = findViewById(R.id.contraseña);
         crearCuenta = findViewById(R.id.crearCuenta);
         iniciar = findViewById(R.id.button);
+
 
         initialize();
 
@@ -72,8 +78,8 @@ public class IniciarSesion extends AppCompatActivity {
         iniciar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent( IniciarSesion.this, MainActivity.class);
-                startActivity(intent);
+                inicio(correo.getText().toString(), contraseña.getText().toString());
+
             }
         });
 
@@ -128,10 +134,9 @@ public class IniciarSesion extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()){
                         getUsuario(email);
-                        Toast.makeText(IniciarSesion.this, "Inicio exitoso", Toast.LENGTH_SHORT).show();
 
                     } else{
-                        Toast.makeText(IniciarSesion.this, "Error iniciando cuenta", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(IniciarSesion.this, "Verifique datos", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -148,6 +153,15 @@ public class IniciarSesion extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                /*
+                                String nombres = document.getData().get("nombre").toString();
+                                String email = document.getData().get("email").toString();
+                                List<String> categorias = (List<String>) document.getData().get("categorias");
+                                String id = document.getId();
+
+                                recetero = new Recetero(nombres, email, id, categorias);
+
+                                */
                                 recetero = document.toObject(Recetero.class);
                             }
 
@@ -155,8 +169,8 @@ public class IniciarSesion extends AppCompatActivity {
                             Toast.makeText(IniciarSesion.this, "Error", Toast.LENGTH_SHORT).show();
                         }
                         if(recetero!=null ){
-                            tokenID();
                             sessionManager.createSession(recetero);
+                            Toast.makeText(IniciarSesion.this, ""+recetero.getNombre(), Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(IniciarSesion.this, MainActivity.class);
                             startActivity(intent);
                         }

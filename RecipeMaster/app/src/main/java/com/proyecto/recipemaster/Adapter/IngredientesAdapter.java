@@ -91,6 +91,8 @@ public class IngredientesAdapter extends RecyclerView.Adapter<IngredientesAdapte
                 @Override
                 public void onClick(View view) {
                     ingredientes.remove(getAdapterPosition());
+                    ingredienteEdt.setText(null);
+                    notifyDataSetChanged();
 
 
                 }

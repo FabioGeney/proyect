@@ -35,6 +35,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -45,8 +46,11 @@ import com.proyecto.recipemaster.Adapter.PasosAdapter;
 import com.proyecto.recipemaster.Clases.Ingredientes;
 import com.proyecto.recipemaster.Clases.Pasos;
 import com.proyecto.recipemaster.Clases.Receta;
+import com.proyecto.recipemaster.Clases.Recetero;
+import com.proyecto.recipemaster.Clases.SessionManager;
 import com.proyecto.recipemaster.Clases.Utility;
 import com.proyecto.recipemaster.R;
+import com.proyecto.recipemaster.Singletons.SingletonUsuario;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -79,6 +83,8 @@ public class CrearProducto extends AppCompatActivity {
     private Uri hImagenUri;
     private PasosAdapter pasosAdapter;
     private Button publicar;
+    private Recetero receteroU;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +143,15 @@ public class CrearProducto extends AppCompatActivity {
 
             }
         });
+
+        SessionManager sessionManager = new SessionManager(this);
+        Gson gson = new Gson();
+        String userGson = sessionManager.getUsuario();
+        receteroU = gson.fromJson(userGson,Recetero.class);
+
+
+        Toast.makeText(this, receteroU.getNombre(), Toast.LENGTH_SHORT).show();
+
         setIngredientes();
         setPasos();
 
@@ -391,14 +406,14 @@ public class CrearProducto extends AppCompatActivity {
 
     private void guardarReceta(){
         CollectionReference enviarReceta = db.collection("Recetas");
-        String idUsuario = "23123";
+        String idUsuario = receteroU.getId();
         String name = nombre.getText().toString();
         String descrip = descripcion.getText().toString();
-        String tipo = "Azucar";
+        String tipoR = tipo.getText().toString() ;
         List<Pasos> pasos = pasosAdapter.getPasos();
         List<Ingredientes> ingredientes = ingredientesAdapter.getIngredientes();
 
-        Receta receta = new Receta(idUsuario, name, "yo", descrip, tipo, picture, pasos, ingredientes);
+        Receta receta = new Receta(idUsuario, name, receteroU.getNombre(), descrip, tipoR, picture, pasos, ingredientes);
         enviarReceta.add(receta);
     }
 

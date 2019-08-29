@@ -22,12 +22,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 import com.proyecto.recipemaster.Adapter.CategoriasAdapter;
 import com.proyecto.recipemaster.Adapter.CategoriasAdapterInicio;
 import com.proyecto.recipemaster.Adapter.RecetasAdapter;
 import com.proyecto.recipemaster.Clases.Receta;
+import com.proyecto.recipemaster.Clases.Recetero;
+import com.proyecto.recipemaster.Clases.SessionManager;
 import com.proyecto.recipemaster.Models.Categoria;
 import com.proyecto.recipemaster.R;
+import com.proyecto.recipemaster.Singletons.SingletonReceta;
+import com.proyecto.recipemaster.Vistas.CategoriaActivity;
 import com.proyecto.recipemaster.Vistas.RecetasActivity;
 
 import java.io.Serializable;
@@ -83,7 +88,24 @@ public class InicioFragment extends Fragment {
         layoutManagerRecom = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         layoutManagerCat = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 
-        recomendadas = getRecomendados();
+        SessionManager sessionManager = new SessionManager(getContext());
+        Gson gson = new Gson();
+        String userGson = sessionManager.getUsuario();
+        Recetero recetero = gson.fromJson(userGson, Recetero.class);
+
+        List<String> temp = recetero.getCategorias();
+
+        String categoriaRecomendada = null;
+
+        if(temp.size()>1){
+            int numero = (int) (Math.random() * temp.size());
+            categoriaRecomendada = temp.get(numero);
+
+        }else{
+            categoriaRecomendada = temp.get(0);
+        }
+
+        recomendadas = getRecomendados(categoriaRecomendada);
 
         populares = getPopulares();
 
@@ -93,6 +115,9 @@ public class InicioFragment extends Fragment {
             @Override
             public void OnItemClick(Categoria categoria, int posicion) {
 
+                Intent intent = new Intent(getContext(), CategoriaActivity.class);
+                intent.putExtra("categoria", categoria);
+                startActivity(intent);
             }
         });
 
@@ -104,11 +129,13 @@ public class InicioFragment extends Fragment {
     }
 
 
-    private ArrayList<Receta> getRecomendados(){
+    private ArrayList<Receta> getRecomendados(String tipo){
+
+
 
         final ArrayList<Receta> recetasRequest = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Recetas")
+        db.collection("Recetas").whereEqualTo("tipo", tipo)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -117,6 +144,7 @@ public class InicioFragment extends Fragment {
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
                                 Receta receta = document.toObject(Receta.class);
+                                receta.setIdDocument(document.getId());
                                 recetasRequest.add(receta);
 
                             }
@@ -124,7 +152,10 @@ public class InicioFragment extends Fragment {
                             remendadosAdapter = new RecetasAdapter(recomendadas, getContext(), R.layout.list_recetas, new RecetasAdapter.OnItemClickListener() {
                                 @Override
                                 public void OnItemClick(Receta receta, int posicion) {
-
+                                    Intent intent = new Intent(getContext(), RecetasActivity.class);
+                                    SingletonReceta singletonReceta = SingletonReceta.getInstance();
+                                    singletonReceta.setReceta(receta);
+                                    startActivity(intent);
 
                                 }
                             });
@@ -158,15 +189,17 @@ public class InicioFragment extends Fragment {
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
                                 Receta receta = document.toObject(Receta.class);
+                                receta.setIdDocument(document.getId());
                                 recetasRequest.add(receta);
 
                             }
                             // Inicializar el adaptador con la fuente de datos.
-                            popAdapter = new RecetasAdapter(recomendadas, getContext(), R.layout.list_recetas, new RecetasAdapter.OnItemClickListener() {
+                            popAdapter = new RecetasAdapter(populares, getContext(), R.layout.list_recetas, new RecetasAdapter.OnItemClickListener() {
                                 @Override
                                 public void OnItemClick(Receta receta, int posicion) {
                                     Intent intent = new Intent(getContext(), RecetasActivity.class);
-                                    intent.putExtra("receta",  receta);
+                                    SingletonReceta singletonReceta = SingletonReceta.getInstance();
+                                    singletonReceta.setReceta(receta);
                                     startActivity(intent);
 
                                 }
@@ -190,12 +223,12 @@ public class InicioFragment extends Fragment {
 
     private List<Categoria> getCategorias(){
         ArrayList<Categoria> temp = new ArrayList<>();
-        temp.add(new Categoria("Típica", 1));
-        temp.add(new Categoria("Fast", 1));
-        temp.add(new Categoria("Fit", 1));
-        temp.add(new Categoria("Europea", 1));
-        temp.add(new Categoria("Asiatica", 1));
-        temp.add(new Categoria("Otro", 1));
+        temp.add(new Categoria("Típica", R.drawable.tipica));
+        temp.add(new Categoria("Fast", R.drawable.fast));
+        temp.add(new Categoria("Fit", R.drawable.fit));
+        temp.add(new Categoria("Europea", R.drawable.europea));
+        temp.add(new Categoria("Asiatica", R.drawable.asiatica));
+        temp.add(new Categoria("Otro", R.drawable.otros));
 
         return temp;
     }

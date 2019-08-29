@@ -5,7 +5,9 @@ import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.proyecto.recipemaster.Fragments.BuscarFragment;
 import com.proyecto.recipemaster.Fragments.InicioFragment;
+import com.proyecto.recipemaster.Fragments.PerfilFragment;
 import com.proyecto.recipemaster.Vistas.CrearProducto;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,17 +32,18 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     fragment = new InicioFragment();
-                    return true;
+                    break;
                 case R.id.navigation_dashboard:
-
-                    return true;
+                    fragment = new BuscarFragment();
+                    break;
                 case R.id.navigation_notifications:
-
-                    return true;
+                    fragment = new PerfilFragment();
+                    break;
             }
             return loadFragment(fragment);
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
