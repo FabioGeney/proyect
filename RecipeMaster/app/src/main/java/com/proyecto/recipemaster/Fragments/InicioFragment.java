@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,6 +62,8 @@ public class InicioFragment extends Fragment {
     private List<Receta> populares;
     private List<Categoria> categorias;
 
+    private GridLayoutManager gridLayoutManager;
+
 
     public InicioFragment() {
         // Required empty public constructor
@@ -111,6 +114,9 @@ public class InicioFragment extends Fragment {
 
         categorias = getCategorias();
 
+        gridLayoutManager = new GridLayoutManager(getContext(), 3);
+        gridLayoutManager.setOrientation(RecyclerView.VERTICAL);
+
         catAdapter = new CategoriasAdapter(categorias, R.layout.list_cat_inicio, new CategoriasAdapter.OnItemClickListener() {
             @Override
             public void OnItemClick(Categoria categoria, int posicion) {
@@ -122,7 +128,7 @@ public class InicioFragment extends Fragment {
         });
 
         recyclerCat.setAdapter(catAdapter);
-        recyclerCat.setLayoutManager(layoutManagerCat);
+        recyclerCat.setLayoutManager(gridLayoutManager);
 
 
         return root;
@@ -130,8 +136,6 @@ public class InicioFragment extends Fragment {
 
 
     private ArrayList<Receta> getRecomendados(String tipo){
-
-
 
         final ArrayList<Receta> recetasRequest = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -227,7 +231,7 @@ public class InicioFragment extends Fragment {
         temp.add(new Categoria("Fast", R.drawable.fast));
         temp.add(new Categoria("Fit", R.drawable.fit));
         temp.add(new Categoria("Europea", R.drawable.europea));
-        temp.add(new Categoria("Asiatica", R.drawable.asiatica));
+        temp.add(new Categoria("Oriental", R.drawable.asiatica));
         temp.add(new Categoria("Otro", R.drawable.otros));
 
         return temp;

@@ -15,6 +15,7 @@ public class Receta implements Serializable {
     private String imagen;
     private List<Pasos> pasos = new ArrayList<>();
     private List<Ingredientes> ingredientes = new ArrayList<>();
+    private String ingredienteLowerCase;
 
     public Receta() {
     }
@@ -28,6 +29,26 @@ public class Receta implements Serializable {
         this.imagen = imagen;
         this.pasos = pasos;
         this.ingredientes = ingredientes;
+    }
+
+    public Receta(String idUsuario, String nombre, String nombreRecetario,  String descripcion, String tipo, String imagen , List<Pasos> pasos, List<Ingredientes> ingredientes, String ingredienteLowerCase) {
+        this.idUsuario = idUsuario;
+        this.nombre = nombre;
+        this.nombreRecetario = nombreRecetario;
+        this.descripcion = descripcion;
+        this.tipo = tipo;
+        this.imagen = imagen;
+        this.pasos = pasos;
+        this.ingredientes = ingredientes;
+        this.ingredienteLowerCase = ingredienteLowerCase;
+    }
+
+    public String getIngredienteLowerCase() {
+        return ingredienteLowerCase;
+    }
+
+    public void setIngredienteLowerCase(String ingredienteLowerCase) {
+        this.ingredienteLowerCase = ingredienteLowerCase;
     }
 
     public String getNombreRecetario() {

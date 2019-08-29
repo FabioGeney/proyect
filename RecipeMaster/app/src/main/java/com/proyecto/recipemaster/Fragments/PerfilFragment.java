@@ -78,6 +78,7 @@ public class PerfilFragment extends Fragment {
         nombre = root.findViewById(R.id.nombre);
         favoritos = root.findViewById(R.id.favoritos);
         misRecetas = root.findViewById(R.id.recyclerView);
+        cerrar = root.findViewById(R.id.cerrarSesion);
 
 
 
@@ -92,6 +93,13 @@ public class PerfilFragment extends Fragment {
 
         recetasFavoritas = getFavoritos();
         recetas = getRecetas();
+
+        cerrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sessionManager.logout();
+            }
+        });
 
         return root;
     }

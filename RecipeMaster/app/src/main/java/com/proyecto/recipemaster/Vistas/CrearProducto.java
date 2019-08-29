@@ -208,7 +208,7 @@ public class CrearProducto extends AppCompatActivity {
 
     private void seleccionarImagen(){
 
-        final CharSequence[] items = {"Tomar foto", "Galería", "Cancelar"};
+        final CharSequence[] items = { "Galería", "Cancelar"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Agregar Foto");
         builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -412,8 +412,12 @@ public class CrearProducto extends AppCompatActivity {
         String tipoR = tipo.getText().toString() ;
         List<Pasos> pasos = pasosAdapter.getPasos();
         List<Ingredientes> ingredientes = ingredientesAdapter.getIngredientes();
+        String lowerCase = "";
+        for(Ingredientes ingredientes1: ingredientes){
+            lowerCase = lowerCase + " " +ingredientes1.getNombreCantidad();
+        }
 
-        Receta receta = new Receta(idUsuario, name, receteroU.getNombre(), descrip, tipoR, picture, pasos, ingredientes);
+        Receta receta = new Receta(idUsuario, name, receteroU.getNombre(), descrip, tipoR, picture, pasos, ingredientes, lowerCase);
         enviarReceta.add(receta);
     }
 
@@ -450,6 +454,11 @@ public class CrearProducto extends AppCompatActivity {
             }
         });
         alert.show();
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
 }

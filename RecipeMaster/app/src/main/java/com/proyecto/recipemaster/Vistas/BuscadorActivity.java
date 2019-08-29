@@ -8,67 +8,57 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.ImageView;
+import android.widget.EditText;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.proyecto.recipemaster.Adapter.CategoriasAdapter;
 import com.proyecto.recipemaster.Adapter.RecetasAdapter;
 import com.proyecto.recipemaster.Clases.Receta;
 import com.proyecto.recipemaster.Models.Categoria;
 import com.proyecto.recipemaster.R;
 import com.proyecto.recipemaster.Singletons.SingletonReceta;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoriaActivity extends AppCompatActivity {
+public class BuscadorActivity extends AppCompatActivity {
 
-    private RecyclerView recetas;
-    private CollapsingToolbarLayout ctlLayout;
+    private RecyclerView requestRecycler;
+    private RecyclerView.Adapter requessAdapter;
+    private List<Receta> requesriaList;
     private GridLayoutManager gridLayoutManager;
-    private List<Receta> recetasList;
-    private RecyclerView.Adapter recetasAdapter;
-    private ImageView imageView;
+    private String request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_categoria);
-
-        ctlLayout = findViewById(R.id.ctlLayout);
-        recetas = findViewById(R.id.listaRecetas);
-        imageView = findViewById(R.id.imgToolbar);
+        setContentView(R.layout.activity_buscador);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        request = getIntent().getStringExtra("request");
+        this.setTitle(request);
 
-        Categoria categoria = (Categoria) getIntent().getSerializableExtra("categoria");
+        requestRecycler = findViewById(R.id.request);
 
-        ctlLayout.setTitle(categoria.getNombre());
-        Picasso.with(this).load(categoria.getImagen()).fit().into(imageView);
-
-
-        gridLayoutManager =  new GridLayoutManager(this, 2);
+        gridLayoutManager = new GridLayoutManager(this, 2);
         gridLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        recetasList = getRecetas(categoria.getNombre());
+
+        requesriaList = getRequest();
 
 
     }
 
-    private ArrayList<Receta> getRecetas(String cat){
-        final ArrayList<Receta> temp = new ArrayList<>();
-
+    private ArrayList<Receta> getRequest(){
+        final String temp = request.toLowerCase();
+        final ArrayList<Receta> recetasRequest = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Recetas").whereEqualTo("tipo", cat)
+        db.collection("Recetas")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -76,25 +66,39 @@ public class CategoriaActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
-
                                 Receta receta = document.toObject(Receta.class);
                                 receta.setIdDocument(document.getId());
-                                temp.add(receta);
+
+                                String nombre = receta.getNombre().toLowerCase();
+                                if( receta.getIngredienteLowerCase()!= null){
+                                    String ingredientes = receta.getIngredienteLowerCase().toLowerCase();
+                                    if(ingredientes.contains(temp) || temp.contains(ingredientes)){
+                                        recetasRequest.add(receta);
+                                    }
+                                }
+
+
+                                if(nombre.contains(temp) || temp.contains(nombre)){
+                                    recetasRequest.add(receta);
+                                }
+
 
                             }
-                            recetasAdapter = new RecetasAdapter(recetasList, CategoriaActivity.this,  R.layout.list_recetas, new RecetasAdapter.OnItemClickListener() {
+                            // Inicializar el adaptador con la fuente de datos.
+                            requessAdapter = new RecetasAdapter(requesriaList, BuscadorActivity.this, R.layout.list_recetas, new RecetasAdapter.OnItemClickListener() {
                                 @Override
                                 public void OnItemClick(Receta receta, int posicion) {
-                                    Intent intent = new Intent(CategoriaActivity.this, RecetasActivity.class);
+                                    Intent intent = new Intent(BuscadorActivity.this, RecetasActivity.class);
                                     SingletonReceta singletonReceta = SingletonReceta.getInstance();
                                     singletonReceta.setReceta(receta);
                                     startActivity(intent);
+
                                 }
                             });
-
                             //Relacionando la lista con el adaptador
-                            recetas.setLayoutManager(gridLayoutManager);
-                            recetas.setAdapter(recetasAdapter);
+                            requestRecycler.setLayoutManager(gridLayoutManager);
+                            requestRecycler.setAdapter(requessAdapter);
+
 
 
                         } else {
@@ -102,11 +106,16 @@ public class CategoriaActivity extends AppCompatActivity {
                         }
                     }
                 });
-        return temp;
+
+        return recetasRequest;
+
+
     }
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
     }
+
+
 }

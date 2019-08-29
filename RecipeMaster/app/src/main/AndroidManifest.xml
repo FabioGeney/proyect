@@ -18,7 +18,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Vistas.CategoriaActivity"></activity>
+        <activity android:name=".Vistas.PerfilAvtivity"></activity>
+        <activity android:name=".Vistas.BuscadorActivity" />
+        <activity android:name=".Vistas.CategoriaActivity" />
         <activity android:name=".Vistas.ComentariosActivity" />
         <activity android:name=".Vistas.RecetasActivity" />
         <activity android:name=".Vistas.CrearCuenta" />

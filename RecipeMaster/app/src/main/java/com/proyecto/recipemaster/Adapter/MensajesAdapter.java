@@ -55,16 +55,20 @@ public class MensajesAdapter extends RecyclerView.Adapter<MensajesAdapter.ViewHo
 
 
         public TextView nombre ;
-        ;
+        public TextView descr ;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             nombre = itemView.findViewById(R.id.nombre);
+            descr = itemView.findViewById(R.id.comentario);
 
 
 
         }
         public void bind( final Comentario comentario, final OnItemClickListener listener){
 
+            nombre.setText(comentario.getNombreRemintente());
+            descr.setText(comentario.getMensaje());
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

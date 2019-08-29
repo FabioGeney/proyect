@@ -104,6 +104,15 @@ public class RecetasActivity extends AppCompatActivity {
             }
         });
 
+        de.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(RecetasActivity.this, PerfilAvtivity.class);
+                intent.putExtra("idRecetero", receta.getIdUsuario());
+                startActivity(intent);
+            }
+        });
+
         ingredientesRecycler.setLayoutManager(layoutManagerIngre);
         ingredientesRecycler.setAdapter(ingreAdapter);
 
@@ -188,5 +197,11 @@ public class RecetasActivity extends AppCompatActivity {
         token.put("favoritos", temp);
         db.collection("Usuarios").document(id).update(token);
 
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }
