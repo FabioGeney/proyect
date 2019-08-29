@@ -4,6 +4,7 @@ public class Comentario {
     private String nombreRemintente;
     private String idRemitente;
     private String mensaje;
+    private String idDocument;
 
     public Comentario() {
     }
@@ -12,6 +13,14 @@ public class Comentario {
         this.nombreRemintente = nombreRemintente;
         this.idRemitente = idRemitente;
         this.mensaje = mensaje;
+    }
+
+    public String getIdDocument() {
+        return idDocument;
+    }
+
+    public void setIdDocument(String idDocument) {
+        this.idDocument = idDocument;
     }
 
     public String getNombreRemintente() {

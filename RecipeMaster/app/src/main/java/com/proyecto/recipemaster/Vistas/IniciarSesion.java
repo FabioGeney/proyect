@@ -126,8 +126,8 @@ public class IniciarSesion extends AppCompatActivity {
 
     private void inicio(final String email, String password){
         if(email.equals("admin") && password.equals("admin")){
-            //Intent intent = new Intent(IniciarSesion.this, MainActivity.class);
-            //startActivity(intent);
+            Intent intent = new Intent(IniciarSesion.this, AdminActivity.class);
+            startActivity(intent);
         }else {
             firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
