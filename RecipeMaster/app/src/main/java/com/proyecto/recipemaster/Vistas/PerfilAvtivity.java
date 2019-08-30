@@ -24,6 +24,7 @@ import com.proyecto.recipemaster.Clases.Recetero;
 import com.proyecto.recipemaster.Clases.SessionManager;
 import com.proyecto.recipemaster.R;
 import com.proyecto.recipemaster.Singletons.SingletonReceta;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,7 @@ public class PerfilAvtivity extends AppCompatActivity {
 
         nombre = findViewById(R.id.nombre);
         misRecetas = findViewById(R.id.recyclerView);
+        circleImageView = findViewById(R.id.image);
 
         getNombre();
         recetas = getRecetas();
@@ -70,7 +72,12 @@ public class PerfilAvtivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){
                     String temp = task.getResult().getData().get("nombre").toString();
+                    Object image = task.getResult().getData().get("image");
                     nombre.setText(temp);
+                    if(image!=null){
+                        Picasso.with(PerfilAvtivity.this).load(image.toString()).fit().into(circleImageView);
+                    }
+
                 }
             }
         });

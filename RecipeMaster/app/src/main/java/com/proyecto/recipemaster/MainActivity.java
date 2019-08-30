@@ -5,9 +5,13 @@ import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.proyecto.recipemaster.Clases.Recetero;
+import com.proyecto.recipemaster.Clases.SessionManager;
 import com.proyecto.recipemaster.Fragments.BuscarFragment;
 import com.proyecto.recipemaster.Fragments.InicioFragment;
 import com.proyecto.recipemaster.Fragments.PerfilFragment;
+import com.proyecto.recipemaster.Singletons.SingletonUsuario;
 import com.proyecto.recipemaster.Vistas.CrearProducto;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,6 +56,12 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         mTextMessage = findViewById(R.id.message);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        SessionManager sessionManager = new SessionManager(this);
+        SingletonUsuario singletonUsuario = SingletonUsuario.getInstance();
+        Gson gson = new Gson();
+        String userGson = sessionManager.getUsuario();
+        Recetero recetero = gson.fromJson(userGson, Recetero.class);
+        singletonUsuario.setReceta(recetero);
 
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

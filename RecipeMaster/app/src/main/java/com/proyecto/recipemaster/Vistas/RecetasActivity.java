@@ -30,6 +30,7 @@ import com.proyecto.recipemaster.Clases.Recetero;
 import com.proyecto.recipemaster.Clases.SessionManager;
 import com.proyecto.recipemaster.R;
 import com.proyecto.recipemaster.Singletons.SingletonReceta;
+import com.proyecto.recipemaster.Singletons.SingletonUsuario;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -136,8 +137,6 @@ public class RecetasActivity extends AppCompatActivity {
         });
 
 
-
-
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -174,9 +173,11 @@ public class RecetasActivity extends AppCompatActivity {
         String userGson = sessionManager.getUsuario();
         Recetero recetero = gson.fromJson(userGson, Recetero.class);
         if(recetero.isState(receta.getIdDocument())){
-            recetero.removeFav(receta);
+            recetero.removeFav(receta.getIdDocument());
+            updateDatabase(receta.getLikes()-1);
         }else {
-            recetero.addFavoritos( receta );
+            recetero.addFavoritos( receta.getIdDocument(), receta );
+            updateDatabase(receta.getLikes()+1);
         }
         sessionManager.createSession(recetero);
         //updateDatabase(recetero.getFavoritos(), recetero.getId());
@@ -189,14 +190,15 @@ public class RecetasActivity extends AppCompatActivity {
         Recetero recetero = gson.fromJson(userGson, Recetero.class);
 
         return recetero.isState(receta.getIdDocument());
+
     }
 
-    private void updateDatabase(List<Receta> temp, String id){
+    private void updateDatabase(int likes){
+        String id = receta.getIdDocument();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Map<String, Object> token = new HashMap<>();
-        token.put("favoritos", temp);
-        db.collection("Usuarios").document(id).update(token);
-
+        token.put("likes", likes);
+        db.collection("Recetas").document(id).update(token);
     }
 
     @Override

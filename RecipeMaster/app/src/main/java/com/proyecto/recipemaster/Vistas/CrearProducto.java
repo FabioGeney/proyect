@@ -86,6 +86,7 @@ public class CrearProducto extends AppCompatActivity {
     private Recetero receteroU;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -405,6 +406,7 @@ public class CrearProducto extends AppCompatActivity {
     }
 
     private void guardarReceta(){
+
         CollectionReference enviarReceta = db.collection("Recetas");
         String idUsuario = receteroU.getId();
         String name = nombre.getText().toString();

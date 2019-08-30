@@ -10,8 +10,9 @@ public class Recetero {
     private String id;
     private String correo;
     private List<String> categorias;
-    private List<Receta> favoritos = new ArrayList<>();
+    private Map<String, Receta> favoritos = new HashMap<>();
     private boolean inab;
+    private String image;
 
     public Recetero() {
     }
@@ -23,8 +24,16 @@ public class Recetero {
         this.categorias = categorias;
 
     }
+    public Recetero(String nombre, String correo, String id, List<String>categorias, String image) {
+        this.nombre = nombre;
+        this.correo = correo;
+        this.id = id;
+        this.categorias = categorias;
+        this.image = image;
 
-    public Recetero(String nombre, String id, String correo, List<String> categorias,  List<Receta> favoritos) {
+    }
+
+    public Recetero(String nombre, String id, String correo, List<String> categorias,  HashMap<String, Receta> favoritos) {
         this.nombre = nombre;
         this.id = id;
         this.correo = correo;
@@ -32,40 +41,41 @@ public class Recetero {
         this.favoritos = favoritos;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     public boolean isState(String key) {
 
         boolean bool = false;
-        for (Receta receta : favoritos){
-            if(receta.getIdDocument().equals(key));
-            {
-                bool = true;
-            }
+
+        if(favoritos.get(key)!=null)
+        {
+            bool = true;
         }
+
         return bool;
     }
 
-    public  List<Receta> getFavoritos() {
+    public  Map<String, Receta> getFavoritos() {
         return favoritos;
     }
 
-    public void setFavoritos( List<Receta> favoritos) {
+    public void setFavoritos( HashMap<String, Receta> favoritos) {
         this.favoritos = favoritos;
     }
 
-    public void removeFav(Receta key){
-        int i = 0;
-        for(Receta receta: favoritos){
-            if(receta.getIdDocument().equals(key));
-            {
-                favoritos.remove(i);
-            }
-            i++;
-        }
+    public void removeFav(String key){
 
+       favoritos.remove(key);
     }
 
-    public void addFavoritos(Receta value) {
-       favoritos.add( value);
+    public void addFavoritos(String key, Receta value) {
+       favoritos.put( key, value);
     }
 
     public String getNombre() {

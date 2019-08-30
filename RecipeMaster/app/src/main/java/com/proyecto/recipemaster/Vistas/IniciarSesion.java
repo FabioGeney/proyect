@@ -78,7 +78,10 @@ public class IniciarSesion extends AppCompatActivity {
         iniciar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                inicio(correo.getText().toString(), contraseña.getText().toString());
+                if(correo.getText() != null && contraseña.getText() != null){
+                    inicio(correo.getText().toString(), contraseña.getText().toString());
+                }
+
 
             }
         });
