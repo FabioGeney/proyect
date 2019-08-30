@@ -173,7 +173,7 @@ public class IniciarSesion extends AppCompatActivity {
                         }
                         if(recetero!=null ){
                             sessionManager.createSession(recetero);
-                            Toast.makeText(IniciarSesion.this, ""+recetero.getNombre(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(IniciarSesion.this, "Bienvenido", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(IniciarSesion.this, MainActivity.class);
                             startActivity(intent);
                         }

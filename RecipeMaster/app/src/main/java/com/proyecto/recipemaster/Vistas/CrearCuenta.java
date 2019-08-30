@@ -147,7 +147,7 @@ public class CrearCuenta extends AppCompatActivity {
                             user.put("id",id);
                             user.put("categorias",categoriasAdapterInicio.getItem());
                             db.collection("Usuarios").document(id).set(user);
-                            Toast.makeText(CrearCuenta.this, "Cuenta Creada", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CrearCuenta.this, "Cuenta creada exitoasamente", Toast.LENGTH_SHORT).show();
                             Intent i = new Intent(CrearCuenta.this, IniciarSesion.class);
                             startActivity(i);
                         } else{

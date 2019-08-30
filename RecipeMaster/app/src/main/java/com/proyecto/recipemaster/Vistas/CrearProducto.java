@@ -49,6 +49,7 @@ import com.proyecto.recipemaster.Clases.Receta;
 import com.proyecto.recipemaster.Clases.Recetero;
 import com.proyecto.recipemaster.Clases.SessionManager;
 import com.proyecto.recipemaster.Clases.Utility;
+import com.proyecto.recipemaster.MainActivity;
 import com.proyecto.recipemaster.R;
 import com.proyecto.recipemaster.Singletons.SingletonUsuario;
 import com.squareup.picasso.Picasso;
@@ -151,7 +152,6 @@ public class CrearProducto extends AppCompatActivity {
         receteroU = gson.fromJson(userGson,Recetero.class);
 
 
-        Toast.makeText(this, receteroU.getNombre(), Toast.LENGTH_SHORT).show();
 
         setIngredientes();
         setPasos();
@@ -173,12 +173,6 @@ public class CrearProducto extends AppCompatActivity {
         publicar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<Pasos> pasos = pasosAdapter.getPasos();
-                String temp = "";
-                for(Pasos index: pasos){
-                    temp = temp+" "+index.getDescripcion();
-                }
-                Toast.makeText(CrearProducto.this, ""+temp, Toast.LENGTH_SHORT).show();
 
                 uploadFile();
             }
@@ -421,6 +415,9 @@ public class CrearProducto extends AppCompatActivity {
 
         Receta receta = new Receta(idUsuario, name, receteroU.getNombre(), descrip, tipoR, picture, pasos, ingredientes, lowerCase);
         enviarReceta.add(receta);
+        Toast.makeText(this, "Receta publicada", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(CrearProducto.this, MainActivity.class);
+        startActivity(intent);
     }
 
     private void seleccionaTipo(){
