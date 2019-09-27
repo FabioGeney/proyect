@@ -1,1 +1,1 @@
-aplicación móvil para compartir recetas
+aplicación móvil para compartir y ver recetas
